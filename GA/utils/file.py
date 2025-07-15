@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
-import random
-import numpy as np
-import math
+import csv
+import os
+
 #Le o arquivo EVRP, e armazena suas informações em um dicionario data
 def read_evrp_file(file_path):
     data = {
@@ -209,101 +209,13 @@ def plot_single_route_with_trips(data, single_route):
     plt.tight_layout()
     plt.show()
 
-#Cria uma rota aleatoria, baseado nos clientes e no numero de rotas
-def gerar_rota_unica_com_multiplas_viagens(num_clientes, num_rotas=3):
-    """
-    Gera uma única rota que representa múltiplas viagens de caminhões.
-    Formato: [1, clientes..., 1, clientes..., 1, ..., 1]
-    Regras:
-    - Sempre começa e termina com 1
-    - Contém exatamente (num_rotas - 1) '1's no meio
-    - Nenhum '1' consecutivo
-    """
-    if num_rotas < 2:
-        raise ValueError("num_rotas deve ser pelo menos 2")
-    
-    clientes = list(range(2, 2 + num_clientes))  # IDs dos clientes
-    random.shuffle(clientes)
-    
-    # Divide os clientes em (num_rotas) grupos
-    divisoes = sorted(random.sample(range(1, num_clientes), k=num_rotas-1))
-    grupos = []
-    inicio = 0
-    for fim in divisoes:
-        grupos.append(clientes[inicio:fim])
-        inicio = fim
-    grupos.append(clientes[inicio:])  # Último grupo
-    
-    # Constroi a rota única intercalando com depósitos
-    rota = [1]
-    for grupo in grupos:
-        rota.extend(grupo)
-        rota.append(1)
-    
-    # Garante que não sobrou nenhum cliente
-    assert len([x for x in rota if x != 1]) == num_clientes
-    
-    return np.array(rota)
-
-#Calcula a distancia total da rota
-def calcular_distancia_total(data, rota):
-    """
-    Calcula a distância total percorrida em uma rota com múltiplos trajetos.
-    
-    Parâmetros:
-    - data: dicionário contendo 'NODE_COORD_SECTION' com as coordenadas dos nós
-    - rota: lista representando a rota completa com múltiplos trajetos (ex: [1,2,3,1,4,5,1])
-    
-    Retorna:
-    - Distância total percorrida
-    """
-    coords = data['NODE_COORD_SECTION']
-    distancia_total = 0.0
-    
-    for i in range(len(rota) - 1):
-        node_atual = rota[i]
-        node_proximo = rota[i+1]
-        
-        x1, y1 = coords[node_atual]
-        x2, y2 = coords[node_proximo]
-        
-        distancia_total += math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-    
-    return distancia_total
-
-#Codifica a rota
-def codifica_rota(rota):
-    resultado = []
-    for num in rota:
-        # Garante que o número está no intervalo [0, 31]
-        num_truncado = max(0, min(num, 31))
-        # Converte para binário de 5 bits e preenche com zeros à esquerda
-        binario = format(num_truncado, '05b')
-        # Separa cada bit e converte para inteiro
-        bits_separados = [int(bit) for bit in binario]
-        # Adiciona ao resultado
-        resultado.extend(bits_separados)
-    return np.array(resultado)
-
-#Decodifica a rota
-def decodifica_rota(rota):
-    # Converte para lista se for numpy array
-    bits_list = list(rota) if isinstance(rota, np.ndarray) else rota
-    
-    # Verifica se o comprimento é múltiplo de 5
-    if len(bits_list) % 5 != 0:
-        raise ValueError("O array de bits deve ter comprimento múltiplo de 5")
-    
-    resultado = []
-    for i in range(0, len(bits_list), 5):
-        # Pega os próximos 5 bits
-        cinco_bits = bits_list[i:i+5]
-        # Converte para string binária
-        bin_str = ''.join(map(str, cinco_bits))
-        # Converte para inteiro
-        numero = int(bin_str, 2)
-        resultado.append(numero)
-    
-    return np.array(resultado)
-
-
+def criar_csv_vazio():
+        """Cria um arquivo CSV vazio com os cabeçalhos"""
+        with open('melhores_resultados.csv', 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow([
+                'Avaliacoes', 
+                'Distancia', 
+                'Onde_Foi_Encontrada', 
+                'Melhor_Rota'
+            ])
