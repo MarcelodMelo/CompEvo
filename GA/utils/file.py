@@ -124,7 +124,7 @@ def plot_evrp_instance(data):
     plt.show()
 
 #Plota a rota atual
-def plot_single_route_with_trips(data, single_route):
+def plot_single_route_with_trips(data, single_route, id = None):
     """
     Plota uma única rota com múltiplos trajetos separados por depósitos (1).
     Cada segmento entre dois '1's é considerado um trajeto diferente.
@@ -208,6 +208,12 @@ def plot_single_route_with_trips(data, single_route):
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.show()
+    if id != None:
+        plt.savefig(f'results/pngs/rotas{id}.png')
+        plt.close()
+    else:
+        plt.show()
+
 
 def criar_csv_vazio():
         """Cria um arquivo CSV vazio com os cabeçalhos"""

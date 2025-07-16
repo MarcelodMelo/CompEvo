@@ -1,0 +1,97 @@
+evaluation,selection,crossover,mutation,replacement,taxa_crossover,taxa_mutacao,n_elite,fitness,rota
+distancia,roleta,two_point,swap,elitismo,1.0,0.3,10,667.9509685911141,"[ 1 19 22  8  9  5  6 10 11  1 13 12 14  3  4 17 15  1 20 21 23 18 16  2
+  7  1]"
+distancia,roleta,two_point,swap,elitismo,0.9,0.1,20,611.9635165874059,"[ 1 15 17 16 18 23 21 20 19  1  8 22  5  6  9 10 11  1 13  3  4  2  7 14
+ 12  1]"
+distancia,roleta,two_point,inversao,elitismo,1.0,0.3,10,621.915838379216,"[ 1 14 11 10  9  6  5 22  8  1 13 12  7  2  3  4 16  1 19 20 21 23 18 15
+ 17  1]"
+distancia,roleta,two_point,inversao,elitismo,0.9,0.1,20,701.9054062515897,"[ 1  8  9 10 11 14  7  3 12  1 15 18 16 17  4  2 13  1 19 21 23 20 22  5
+  6  1]"
+distancia,roleta,two_point,scramble,elitismo,1.0,0.3,10,724.5635755324496,"[ 1 22  5  6  9  8 13 15 23  1 12 10 11 14  7  2  3  1 19 20 21 18 16 17
+  4  1]"
+distancia,roleta,two_point,scramble,elitismo,0.9,0.1,20,728.2982706531697,"[ 1  8 13  3  4 17 23 21 20  1 12 14  9  6  5 22 19  1 15 18 16  2  7 11
+ 10  1]"
+distancia,roleta,uniforme,swap,elitismo,1.0,0.3,10,752.059856211956,"[ 1 17 16 18 23 15 11 10  8  1  9  6  5 22 20 21 19  1  7  2  4  3 14 12
+ 13  1]"
+distancia,roleta,uniforme,swap,elitismo,0.9,0.1,20,716.3458684679741,"[ 1  4 17 16 15 18 23 12 13  1  3  2  7 14 11 10  8  1 19 21 20 22  5  6
+  9  1]"
+distancia,roleta,uniforme,inversao,elitismo,1.0,0.3,10,723.7530154157131,"[ 1 11 14  7  2  4  3  1  8 10  9  6  5 22  1 18 23 21 20 19  1 13 12 17
+ 16 15  1]"
+distancia,roleta,uniforme,inversao,elitismo,0.9,0.1,20,616.8820049091926,"[ 1 21 23 18 15 16 17  4  3  1  2  7 14 11 10 12 13  1 19 20 22  5  6  9
+  8  1]"
+distancia,roleta,uniforme,scramble,elitismo,1.0,0.3,10,706.4852998145543,"[ 1 20 18 15  4  3  2  7 13  1 14 11 10  9  6  5 22  1 19 21 23 16 17 12
+  8  1]"
+distancia,roleta,uniforme,scramble,elitismo,0.9,0.1,20,822.0005531315442,"[ 1  9  5 12  7  2  3 15 18  1 11  6 22 20 23 21 19  1 17 16  4 14 10  8
+ 13  1]"
+distancia,torneio,two_point,swap,elitismo,1.0,0.3,10,621.4428896102606,"[ 1 19 20 21 23 18 15 16 17  1  7  2  4  3 14 12 13  1 11 10  9  6  5 22
+  8  1]"
+distancia,torneio,two_point,swap,elitismo,0.9,0.1,20,662.7001889771165,"[ 1 12  7  2 16 18 23 21 20  1 15 17  4  3 14 11 10  1 13  8  9  6  5 22
+ 19  1]"
+distancia,torneio,two_point,inversao,elitismo,1.0,0.3,10,641.914274390865,"[ 1  8  9  5  6 10 11 14 12  1 13  7  2  4 16 17  3  1 22 20 23 18 15 21
+ 19  1]"
+distancia,torneio,two_point,inversao,elitismo,0.9,0.1,20,604.3150868419925,"[ 1 14 11 10  9  6  5 22  8  1 19 20 21 23 18 15 13  1 12  7  2  4 16 17
+  3  1]"
+distancia,torneio,two_point,scramble,elitismo,1.0,0.3,10,718.1030609108934,"[ 1 13  9  7  3  4 16 18 15  1 19 20 21 23 17  2 12  1 14 11 10  6  5 22
+  8  1]"
+distancia,torneio,two_point,scramble,elitismo,0.9,0.1,20,736.3337342315384,"[ 1  9  7  2  3  4 16 21 13  1  8 22  5  6 10 11 14  1 19 20 23 18 15 17
+ 12  1]"
+distancia,torneio,uniforme,swap,elitismo,1.0,0.3,10,827.5443201687477,"[ 1  2  7  6  5  9  1  3  4 23 21 20  1 19 22  8 13  1 10 11 14 12  1 15
+ 18 16 17  1]"
+distancia,torneio,uniforme,swap,elitismo,0.9,0.1,20,788.7945437807809,"[ 1 12 14 11  7  4 17  3 13  1  8 10  9 22 20 23 21  1  5  6  2 16 18 15
+ 19  1]"
+distancia,torneio,uniforme,inversao,elitismo,1.0,0.3,10,613.3291056781143,"[ 1 19 20 21 23 18 15 16 17  1  3  4  2  7 11 14 12  1 22  5  6  9 10  8
+ 13  1]"
+distancia,torneio,uniforme,inversao,elitismo,0.9,0.1,20,637.0447416598523,"[ 1 21 15 17 16 18 23 20 19  1 13 12 14  7  2  4  3  1 11 10  9  6  5 22
+  8  1]"
+distancia,torneio,uniforme,scramble,elitismo,1.0,0.3,10,668.1766276291673,"[ 1  2 18 23 21 20 19 22  8  1  9  5  6 10 11 14 12  1 15 16 17  4  3  7
+ 13  1]"
+distancia,torneio,uniforme,scramble,elitismo,0.9,0.1,20,718.1949907318059,"[ 1  7 14 11 10 12 13  1 15 18 17  4  3  2  1  8  9  6  5 22  1 16 23 21
+ 20 19  1]"
+rankeamento,roleta,two_point,swap,elitismo,1.0,0.3,10,692.7790786896088,"[ 1  2  3  4 17 16 18 15 19  1  8  9  5  6 10 11 13  1 22 20 23 21  7 14
+ 12  1]"
+rankeamento,roleta,two_point,swap,elitismo,0.9,0.1,20,765.265067888529,"[ 1 15 23 18 16  2  7 12 13  1  9  5  6 10  4 17  3  1 19 21 20 22  8 11
+ 14  1]"
+rankeamento,roleta,two_point,inversao,elitismo,1.0,0.3,10,616.3935460748208,"[ 1 19 20 21 23 18 16 17 15  1 14 10  9  6  5 22  8  1 13 12 11  7  2  4
+  3  1]"
+rankeamento,roleta,two_point,inversao,elitismo,0.9,0.1,20,701.1568820743489,"[ 1 15 18 16 17  4  3  1  7  2 21 23 20 19  1 22  5  6  9 10  1 13 12 14
+ 11  8  1]"
+rankeamento,roleta,two_point,scramble,elitismo,1.0,0.3,10,679.0141357888623,"[ 1 15 18 23 21 20 19  1  8 10  9  6  5 22  1 13 12 14 11  7  1  2  3  4
+ 16 17  1]"
+rankeamento,roleta,two_point,scramble,elitismo,0.9,0.1,20,682.4222083201636,"[ 1 20 22  5  6  9  8  1 17 16  4  3  2  7  1 10 11 14 12 13  1 15 18 23
+ 21 19  1]"
+rankeamento,roleta,uniforme,swap,elitismo,1.0,0.3,10,678.4568121330677,"[ 1 23 18 15 16 17  4  3  2  1 22  5  6  9  8 12 13  1 19 20 21  7 14 11
+ 10  1]"
+rankeamento,roleta,uniforme,swap,elitismo,0.9,0.1,20,644.1733635250602,"[ 1 14 11 10  9  6  5 22  8  1 21 23 18 16 17  4  3  1 13 12  7  2 15 20
+ 19  1]"
+rankeamento,roleta,uniforme,inversao,elitismo,1.0,0.3,10,734.7653003134569,"[ 1  8  9 10 14 12 13  1  7  2  4 17 16 18  1 20 21 23 15  3  1 11  6  5
+ 22 19  1]"
+rankeamento,roleta,uniforme,inversao,elitismo,0.9,0.1,20,647.3163991968829,"[ 1 13 12 14 11  7  2  3 15  1 20 21 23 18 16 17  4  1 19 22  5  6  9 10
+  8  1]"
+rankeamento,roleta,uniforme,scramble,elitismo,1.0,0.3,10,733.6799955339487,"[ 1 12  7 14 11 10  6  5 13  1  3  4 15 23 21 20 19  1 22  9  8  2 17 16
+ 18  1]"
+rankeamento,roleta,uniforme,scramble,elitismo,0.9,0.1,20,709.3019875402654,"[ 1  8 22  5  6  9 10 11  7  1 19 23 15  2 14 12 13  1  3  4 17 16 18 21
+ 20  1]"
+rankeamento,torneio,two_point,swap,elitismo,1.0,0.3,10,630.1392954337523,"[ 1  3 17  4  2  7 14 11 10  1 15 16 18 23 21 20 19  1 13 12  8  9  6  5
+ 22  1]"
+rankeamento,torneio,two_point,swap,elitismo,0.9,0.1,20,632.8784491742858,"[ 1 14 11 10  9  6  5 22  8  1 20 21 23 18 16 17 15  1 13 12  7  2  4  3
+ 19  1]"
+rankeamento,torneio,two_point,inversao,elitismo,1.0,0.3,10,621.0624626346653,"[ 1 12 14  7  2  4 16 17  3  1 11 10  8  9  6  5 22  1 13 15 18 23 21 20
+ 19  1]"
+rankeamento,torneio,two_point,inversao,elitismo,0.9,0.1,20,757.273173986405,"[ 1 14 11  6  5 22  1  4 17 16 18 15  1  3  2  7 12  1 21 23 20 19  1  8
+  9 10 13  1]"
+rankeamento,torneio,two_point,scramble,elitismo,1.0,0.3,10,663.6306501900131,"[ 1  7 14 11  9  6  5 22  8  1 17 16  4  3  2 10 12  1 19 20 21 23 18 15
+ 13  1]"
+rankeamento,torneio,two_point,scramble,elitismo,0.9,0.1,20,765.6068575718687,"[ 1 12 14 11  7  2  3 15 18  1  8  9  5  6  4 16 17  1 19 21 23 20 22 10
+ 13  1]"
+rankeamento,torneio,uniforme,swap,elitismo,1.0,0.3,10,681.670781782371,"[ 1  8 10 11 14 12 13 20 19  1 21 23 18 15 16 17  4  1  3  2  7  9  6  5
+ 22  1]"
+rankeamento,torneio,uniforme,swap,elitismo,0.9,0.1,20,676.6029304695996,"[ 1 19 20 23 21  7 12  8 22  1 15 18 16 17  4  3  2  1 13 14 11 10  6  5
+  9  1]"
+rankeamento,torneio,uniforme,inversao,elitismo,1.0,0.3,10,627.7302159536537,"[ 1  8 22 19 20 21 23 18 15  1 17 16  4  3  2  7 13  1  9  5  6 10 11 14
+ 12  1]"
+rankeamento,torneio,uniforme,inversao,elitismo,0.9,0.1,20,616.7935110314245,"[ 1  3 17 16  4  2  7 14 12  1 13 15 18 23 21 20 19  1 11 10  9  6  5 22
+  8  1]"
+rankeamento,torneio,uniforme,scramble,elitismo,1.0,0.3,10,692.8458402553472,"[ 1 15 16 17  4  3  2  1  8 10 11 14  7 12  1 18 23 21 20 19  1 22  5  6
+  9 13  1]"
+rankeamento,torneio,uniforme,scramble,elitismo,0.9,0.1,20,837.831847173532,"[ 1 10  3 15 18 23 21  1 12 14 11  6 22  8  1 17 16  4  2  7  1 19 20  5
+  9 13  1]"

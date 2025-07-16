@@ -254,7 +254,9 @@ def parametros_problema(evrp_data, binario, restricoes):
     params_ervp['binario'] = binario
     params_ervp['restricoes'] = restricoes
     params_ervp['num_rotas_min'] = evrp_data['VEHICLES']
+    print(evrp_data['DIMENSION'].bit_length())
     params_ervp['bits_cidade'] = evrp_data['DIMENSION'].bit_length()
+    print(params_ervp['bits_cidade'])
     if restricoes:
         params_ervp['bits_deposito'] = 1 + evrp_data['STATIONS'].bit_length()
     else:

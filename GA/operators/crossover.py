@@ -62,7 +62,11 @@ def crossover_binario(pai1_bin, pai2_bin, bits_por_elemento, tipo='one_point', t
     
     elif tipo == 'uniforme':
         # Para cada bloco, decide qual pai usar
-        mask = np.random.randint(0, 2, size=len(blocos_pai1)).astype(bool)
+        mask = 0
+        if len(blocos_pai1) > len(blocos_pai2):
+            mask = np.random.randint(0, 2, size=len(blocos_pai2)).astype(bool)
+        else:
+            mask = np.random.randint(0, 2, size=len(blocos_pai1)).astype(bool)
         filho1 = np.vstack([blocos_pai1[i] if mask[i] else blocos_pai2[i] for i in range(len(mask))]) #[0,1,1,0,1]
         filho2 = np.vstack([blocos_pai2[i] if mask[i] else blocos_pai1[i] for i in range(len(mask))])
     
@@ -104,12 +108,12 @@ def crossover_completo(pais, evrp_data, n_filhos, num_rotas_min=3,
         pai2 = pais_ampliados[i+1]
         
         # 1. Codifica para binário (calculando bits_por_elemento)
-        bits_cidade = max(5, (evrp_data['DIMENSION']-1).bit_length())
+        bits_cidade = max(5, (evrp_data['DIMENSION']).bit_length())
         bits_deposito = 1
         bits_por_elemento = bits_cidade + bits_deposito
         
-        pai1_bin = codificar_rota_binaria(pai1, evrp_data)
-        pai2_bin = codificar_rota_binaria(pai2, evrp_data)
+        pai1_bin = codificar_rota_binaria(pai1, evrp_data,bits_cidade)
+        pai2_bin = codificar_rota_binaria(pai2, evrp_data,bits_cidade)
         
         # 2. Aplica crossover com controle de blocos
         filho1_bin, filho2_bin = crossover_binario(
@@ -120,8 +124,8 @@ def crossover_completo(pais, evrp_data, n_filhos, num_rotas_min=3,
         )
         
         # 3. Decodifica
-        filho1 = decodificar_rota_binaria(filho1_bin, evrp_data)
-        filho2 = decodificar_rota_binaria(filho2_bin, evrp_data)
+        filho1 = decodificar_rota_binaria(filho1_bin, evrp_data,bits_cidade)
+        filho2 = decodificar_rota_binaria(filho2_bin, evrp_data,bits_cidade)
         
         # 4. Repara
         filho1 = reparar_filho(filho1, pai1, evrp_data, num_rotas_min, estacao)

@@ -100,6 +100,7 @@ def reparar_filho(filho, pai, evrp_data, num_rotas_min=3, estacao=False):
     
     # 8. Garante número mínimo de rotas
     num_rotas = filho_reparado.count(1) - 1
+
     if num_rotas < num_rotas_min:
         # Divide a maior rota em duas para aumentar o número de rotas
         rotas = []
@@ -133,5 +134,14 @@ def reparar_filho(filho, pai, evrp_data, num_rotas_min=3, estacao=False):
         for rota in rotas:
             filho_reparado.extend(rota)
             filho_reparado.append(1)
+    # else:
+    #     if num_rotas > 1:
+    #         newFilhos = [ x for x in filho_reparado[1:-1] if x != 1]
+    #         if newFilhos[0] != 1:
+    #             newFilhos.insert(0, 1)
+    #         if newFilhos[-1] != 1:
+    #             newFilhos.append(1)
+    #         filho_reparado = newFilhos
+
     
     return np.array(filho_reparado)
