@@ -12,3 +12,5 @@ from .selection import *
 from .crossover import *
 from .mutation import *
 from .replacement import *
+from .crossover_int import *
+from .mutation_int import *
