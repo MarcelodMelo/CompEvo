@@ -217,7 +217,7 @@ def plot_single_route_with_trips(data, single_route, id = None):
 
 def criar_csv_vazio():
         """Cria um arquivo CSV vazio com os cabeçalhos"""
-        with open('melhores_resultados.csv', 'w', newline='') as csvfile:
+        with open('test2.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow([
                 'Avaliacoes', 
