@@ -206,3 +206,25 @@ for params in listparams:
         plt.savefig(pizza_path)
         plt.close()
         print(f'Salvo: {pizza_path}')
+
+        # Gráfico de Pizza (Concentração de Tipos)
+        plt.figure(figsize=(8, 8))
+        counts = df_concat['crossover'].value_counts()
+        plt.pie(counts, labels=counts.index, autopct='%1.1f%%', startangle=140)
+        plt.title(f'Concentração de Alterações\n{arq} - {params}')
+        plt.tight_layout()
+        pizza_path = f'results/pngs/concentracao_cross_{arq}_{params}.png'
+        plt.savefig(pizza_path)
+        plt.close()
+        print(f'Salvo: {pizza_path}')
+
+        # Gráfico de Pizza (Concentração de Tipos)
+        plt.figure(figsize=(8, 8))
+        counts = df_concat['mutation'].value_counts()
+        plt.pie(counts, labels=counts.index, autopct='%1.1f%%', startangle=140)
+        plt.title(f'Concentração de Alterações\n{arq} - {params}')
+        plt.tight_layout()
+        pizza_path = f'results/pngs/concentracao_mut_{arq}_{params}.png'
+        plt.savefig(pizza_path)
+        plt.close()
+        print(f'Salvo: {pizza_path}')
