@@ -124,7 +124,7 @@ def plot_evrp_instance(data):
     plt.show()
 
 #Plota a rota atual
-def plot_single_route_with_trips(data, single_route, id = None):
+def plot_single_route_with_trips(data, single_route, id = None, arq = "", params = ""):
     """
     Plota uma única rota com múltiplos trajetos separados por depósitos (1).
     Cada segmento entre dois '1's é considerado um trajeto diferente.
@@ -207,9 +207,14 @@ def plot_single_route_with_trips(data, single_route, id = None):
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.show()
     if id != None:
-        plt.savefig(f'results/pngs/rotas{id}.png')
+        stringUsada = f'results/pngs/rotas{id}'
+        if arq != None:
+            stringUsada = stringUsada + f"_{arq}"
+        if params != None:
+            stringUsada = stringUsada + f"_{params}"
+        stringUsada = stringUsada + ".png"
+        plt.savefig(stringUsada)
         plt.close()
     else:
         plt.show()

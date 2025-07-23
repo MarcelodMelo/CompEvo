@@ -3,12 +3,13 @@ from GA.operators.export import *
 from GA.utils.export import *
 
 class EVRP_GA:
-    def __init__(self, filename, param_ga, config, binario=True, restricoes=False, id = None):
+    def __init__(self, filename, param_ga, config, estrat = "", binario=True, restricoes=False, id = None):
         self.evrp_data = read_evrp_file(filename)
         self.param_problema = parametros_problema(self.evrp_data, binario, restricoes)
         self.param_ga = param_ga
         self.config = config
         self.id = id
+        self.nameEstrat = estrat
         self.best_run = []
         self.best_dist = float('inf')
         self.population = []
@@ -16,7 +17,7 @@ class EVRP_GA:
         self.pais = []
         self.filhos = []
         self.new_pop = []
-        
+        self.filename = filename
         # Contadores e histórico
         self.n_aval = 0  # Contador de avaliações
         self.historico_melhor_rota = []
@@ -90,12 +91,14 @@ class EVRP_GA:
     def registrar_melhoria_csv(self, onde):
         """Registra uma nova melhoria no CSV"""
         if self.id != None:
-            with open(f'results/csvs/melhores2_resultados{self.id}.csv', 'a', newline='') as csvfile:
+            with open(f'results/csvs/melhores_resultados_{self.filename}_{self.nameEstrat}_{self.id}.csv', 'a', newline='') as csvfile:
                 writer = csv.writer(csvfile)
                 writer.writerow([
                     self.n_aval,
                     self.best_dist,
                     onde,
+                    self.config["crossover"],
+                    self.config["mutation"],
                 ])
             
     
@@ -144,6 +147,133 @@ class EVRP_GA:
         print(f"Parada atingida: {self.n_aval} avaliações realizadas.")
         return self.best_run
     
+
+    def escolher_metodo(self,probabilidades):
+        return random.choices(range(4), weights=probabilidades, k=1)[0]
+
+    def atualizar_pesos(self,sucessos, tentativas):
+        base = 0.01  # para evitar pesos zero
+        pesos = [s / t + base for s, t in zip(sucessos, tentativas)]
+        soma = sum(pesos)
+        return [p / soma for p in pesos]
+
+    def run_2(self):
+        self.initialize()
+        self.evaluate()
+        criar_csv_vazio()
+        
+
+        
+
+        # Contadores e estado para controle de convergência
+        contador_estagnacao = 0
+        MAX_ESTAGNACAO = 5000  # Número de iterações sem melhoria para considerar convergência
+        MELHORIA_MINIMA = 1.0  # Melhoria mínima para resetar contador
+        
+        # Listas de métodos para rotação
+        crossover_methods = ['one_point', 'two_point', 'uniforme', 'OX']
+        mutation_methods = ['swap', 'inversao', 'scramble', 'insercao']
+
+        vetCross = [0.25] * 4
+        vetMut =  [0.25] * 4
+        sucessoCross = [1] * 4  # Começa com 1 para evitar divisão por zero
+        tentativasCross = [1] * 4
+
+        sucessoMut = [1] * 4
+        tentativasMut = [1] * 4
+
+        idx_cross = self.escolher_metodo(vetCross)
+        idx_mut = self.escolher_metodo(vetMut)
+
+        
+        self.config["crossover"] = crossover_methods[idx_cross]
+        self.config["mutation"] = mutation_methods[idx_mut]
+        print(f"Métodos: Crossover={self.config['crossover']}, Mutação={self.config['mutation']}")
+        # Histórico de melhor distância para detecção de convergência
+        last_best_dist = float('inf')
+        
+        while self.n_aval < self.param_ga['max_aval']:
+            # Etapa normal do GA
+            best_rota, best_dist = melhor_rota(self.population, self.evrp_data)
+            
+            # Verifica melhoria
+            if last_best_dist - best_dist > MELHORIA_MINIMA:
+                contador_estagnacao = 0
+                last_best_dist = best_dist
+            else:
+                contador_estagnacao += 1
+            
+            # Atualiza melhor global
+            if self.best_dist > best_dist:
+                print(f"Melhoria na iteração {self.n_aval}: {best_dist:.2f}")
+                self.best_dist = best_dist
+                self.best_run = best_rota
+                self.registrar_melhoria_csv('População')
+            
+            # Verifica convergência
+            if contador_estagnacao >= MAX_ESTAGNACAO:
+                print(f"Convergência detectada na iteração {self.n_aval}. Reiniciando população parcialmente...")
+                
+                # 1. Mantém os melhores indivíduos (elitismo)
+                elite_size = int(0.2 * self.param_ga['n_pop'])  # 20% da população
+                elite = sorted(self.population, key=lambda x: self.fitness[tuple(x)])[:elite_size]
+                
+                # 2. Gera nova população aleatória para o restante
+                new_random = [criar_rotas_aleatorias(self.evrp_data, 
+                            self.param_problema['num_rotas_min'], 
+                            self.param_problema['restricoes']) 
+                            for _ in range(self.param_ga['n_pop'] - elite_size)]
+                
+                # 3. Combina elite + novos indivíduos
+                self.population = elite + new_random
+                self.evaluate()
+                
+                # 4. Rota os métodos de crossover e mutação
+                idx_cross = self.escolher_metodo(vetCross)
+                idx_mut = self.escolher_metodo(vetMut)
+                self.config["crossover"] = crossover_methods[idx_cross]
+                self.config["mutation"] = mutation_methods[idx_mut]
+                print(f"Novos métodos: Crossover={self.config['crossover']}, Mutação={self.config['mutation']}")
+                
+                # 5. Reseta contador de estagnação
+                contador_estagnacao = 0
+            
+            # Processo normal do GA
+            self.historico_melhor_rota.append(best_rota)
+            self.historico_melhor_distancia.append(best_dist)
+            
+            self.selection()
+            self.crossover()
+            
+            best_rota_filhos, best_dist_filhos = melhor_rota(self.filhos, self.evrp_data)
+            if self.best_dist > best_dist_filhos:
+                print(f"Melhoria na iteração {self.n_aval}: {best_dist:.2f} , Crossover")
+                self.best_dist = best_dist_filhos
+                self.best_run = best_rota_filhos
+                sucessoCross[idx_cross] += 1
+                self.registrar_melhoria_csv('Crossover')
+            tentativasCross[idx_cross] += 1
+    
+            self.mutation()
+            best_rota_filhos, best_dist_filhos = melhor_rota(self.filhos, self.evrp_data)
+            if self.best_dist > best_dist_filhos:
+                print(f"Melhoria na iteração {self.n_aval}: {best_dist:.2f} , Mutation")
+                self.best_dist = best_dist_filhos
+                self.best_run = best_rota_filhos
+                self.registrar_melhoria_csv('Mutacao')
+                sucessoMut[idx_mut] += 1
+            tentativasMut[idx_mut] += 1
+            self.replacement()
+            self.population = self.new_pop
+            self.evaluate()
+            if self.n_aval % 100 == 0:
+                vetCross = self.atualizar_pesos(sucessoCross, tentativasCross)
+                vetMut = self.atualizar_pesos(sucessoMut, tentativasMut)
+        print(f"Parada atingida: {self.n_aval} avaliações realizadas.")
+        return self.best_run
+
+
+
     def mostrar_historico(self):
         """Exibe o histórico de melhores distâncias por geração."""
         import matplotlib.pyplot as plt
