@@ -9,3 +9,5 @@ Funções auxiliares para:
 from .auxiliares import *
 from .file import *
 from .repair import *
+from .rest import *
+from .matrix import *

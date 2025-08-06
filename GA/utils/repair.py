@@ -1,4 +1,5 @@
 import numpy as np
+from .rest import aplicar_restricao
 
 def reparar_filho(filho, pai, evrp_data, num_rotas_min=3, estacao=False):
     """
@@ -15,8 +16,15 @@ def reparar_filho(filho, pai, evrp_data, num_rotas_min=3, estacao=False):
         Rota filho reparada (array numpy).
     """
     # Converte para lista para facilitar manipulação
-    filho_list = filho.tolist()
-    pai_list = pai.tolist()
+    if not isinstance(filho, list):
+        filho_list = filho.tolist() if hasattr(filho, 'tolist') else list(filho)
+    else:
+        filho_list = filho.copy()  # Cria uma cópia para evitar modificar a original
+
+    if not isinstance(pai, list):
+        pai_list = pai.tolist() if hasattr(pai, 'tolist') else list(pai)
+    else:
+        pai_list = pai.copy()
     
     # 1. Garante que começa e termina com 1
     if filho_list[0] != 1:
@@ -39,21 +47,20 @@ def reparar_filho(filho, pai, evrp_data, num_rotas_min=3, estacao=False):
     elementos_validos = clientes_validos.union(estacoes_validas)
     
     # 4. Remove clientes inválidos (0, IDs maiores que DIMENSION)
-    clientes_presentes = []
+    visitas_presentes = []
     for node in filho_list[1:-1]:  # Ignora o primeiro e último 1
         if node in elementos_validos:
-            clientes_presentes.append(node)
+            visitas_presentes.append(node)
     
     # 5. Remove duplicatas mantendo a ordem de primeira ocorrência
     clientes_unicos = []
     seen = set()
-    for node in clientes_presentes:
-        if node not in seen:
+    for node in visitas_presentes:
+        if node in clientes_validos and node not in seen:
             seen.add(node)
             clientes_unicos.append(node)
     
     # 6. Completa com clientes faltantes do pai (se necessário)
-    if not estacao:  # Só aplica se não estiver usando estações
         clientes_faltantes = list(clientes_validos - set(clientes_unicos))
         # Adiciona clientes faltantes do pai que não estão no filho
         for node in pai_list[1:-1]:
@@ -142,6 +149,8 @@ def reparar_filho(filho, pai, evrp_data, num_rotas_min=3, estacao=False):
     #         if newFilhos[-1] != 1:
     #             newFilhos.append(1)
     #         filho_reparado = newFilhos
-
-    
+    #print(f"Antes: {[x for x in range(2, 24) if x not in filho_reparado]}")
+    filho_reparado = aplicar_restricao(filho_reparado, evrp_data, num_rotas_min)
+    #print(f"Depois: {[x for x in range(2, 24) if x not in filho_reparado]}")
+    #print()
     return np.array(filho_reparado)

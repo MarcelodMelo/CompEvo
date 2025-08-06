@@ -2,6 +2,96 @@ import random
 import numpy as np
 import math
 
+def criar_rota_nn_inteligente_com_rotas_minimas(data, num_rotas_min=3):
+    depósito = 1
+    clientes_nao_visitados = [i for i in range(2, data['DIMENSION'] + 1) 
+                             if i not in data['STATIONS_COORD_SECTION']]
+    rotas = []
+    
+    for _ in range(num_rotas_min):
+        if not clientes_nao_visitados:
+            break  # Todos os clientes já foram visitados
+        
+        rota = [depósito]
+        bateria = data['ENERGY_CAPACITY']
+        carga = data['CAPACITY']
+        
+        while clientes_nao_visitados:
+            último_ponto = rota[-1]
+            melhor_cliente = None
+            melhor_distância = float('inf')
+            
+            for cliente in clientes_nao_visitados:
+                x1, y1 = data['NODE_COORD_SECTION'][último_ponto]
+                x2, y2 = data['NODE_COORD_SECTION'][cliente]
+                dist = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+                demanda = data['DEMAND_SECTION'][cliente]
+                
+                if (bateria - data['ENERGY_CONSUMPTION'] * dist > 0) and (carga - demanda > 0):
+                    if dist < melhor_distância:
+                        melhor_distância = dist
+                        melhor_cliente = cliente
+            
+            if melhor_cliente:
+                rota.append(melhor_cliente)
+                bateria -= data['ENERGY_CONSUMPTION'] * melhor_distância
+                carga -= data['DEMAND_SECTION'][melhor_cliente]
+                clientes_nao_visitados.remove(melhor_cliente)
+            else:
+                # Recarrega ou volta ao depósito se não houver clientes viáveis
+                estações = data['STATIONS_COORD_SECTION'] + [depósito]
+                estação_próxima = min(
+                    estações,
+                    key=lambda e: math.sqrt(
+                        (data['NODE_COORD_SECTION'][último_ponto][0] - data['NODE_COORD_SECTION'][e][0])**2 +
+                        (data['NODE_COORD_SECTION'][último_ponto][1] - data['NODE_COORD_SECTION'][e][1])**2
+                    )
+                )
+                rota.append(estação_próxima)
+                bateria = data['ENERGY_CAPACITY']
+                if estação_próxima == depósito:
+                    carga = data['CAPACITY']
+                    break  # Fecha a rota atual
+        
+        rota.append(depósito)  # Fecha a rota
+        rotas.extend(rota)
+    
+    # Adiciona clientes restantes (se houver) em rotas extras
+    while clientes_nao_visitados:
+        rota = [depósito]
+        bateria = data['ENERGY_CAPACITY']
+        carga = data['CAPACITY']
+        
+        # Pega os clientes mais próximos do depósito para a nova rota
+        clientes_restantes = sorted(
+            clientes_nao_visitados,
+            key=lambda c: math.sqrt(
+                (data['NODE_COORD_SECTION'][depósito][0] - data['NODE_COORD_SECTION'][c][0])**2 +
+                (data['NODE_COORD_SECTION'][depósito][1] - data['NODE_COORD_SECTION'][c][1])**2
+            )
+        )
+        
+        for cliente in clientes_restantes[:10]:  # Limita a 10 clientes por rota (ajuste conforme necessário)
+            if cliente in clientes_nao_visitados:
+                dist = math.sqrt(
+                    (data['NODE_COORD_SECTION'][rota[-1]][0] - data['NODE_COORD_SECTION'][cliente][0])**2 +
+                    (data['NODE_COORD_SECTION'][rota[-1]][1] - data['NODE_COORD_SECTION'][cliente][1])**2
+                )
+                demanda = data['DEMAND_SECTION'][cliente]
+                
+                if (bateria - data['ENERGY_CONSUMPTION'] * dist > 0) and (carga - demanda > 0):
+                    rota.append(cliente)
+                    bateria -= data['ENERGY_CONSUMPTION'] * dist
+                    carga -= demanda
+                    clientes_nao_visitados.remove(cliente)
+                else:
+                    break
+        
+        rota.append(depósito)
+        rotas.extend(rota)
+    
+    return np.array(rotas)
+
 #Cria uma rota aleatoria, baseado nos clientes e no numero de rotas
 def criar_rotas_aleatorias(evrp_data, num_rotas_min, estacao=False):
     '''

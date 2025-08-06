@@ -3,7 +3,7 @@ from GA.operators.export import *
 from GA.utils.export import *
 
 class EVRP_GA:
-    def __init__(self, filename, param_ga, config, estrat = "", binario=True, restricoes=False, id = None):
+    def __init__(self, filename, param_ga, config, estrat = "", binario=True, restricoes=True, id = None):
         self.evrp_data = read_evrp_file(filename)
         self.param_problema = parametros_problema(self.evrp_data, binario, restricoes)
         self.param_ga = param_ga
@@ -22,11 +22,12 @@ class EVRP_GA:
         self.n_aval = 0  # Contador de avaliações
         self.historico_melhor_rota = []
         self.historico_melhor_distancia = []
+        self.dist_matrix = {}
 
         # Configuração dos operadores
         self.evaluation_methods = {
             'distancia': avaliacao_distancia_pura, #
-            'restricoes': avaliacao_distancia_restricoes,
+            'restricoes': avaliacao_com_penalidades,
             'rankeamento': avaliacao_rankeamento 
         }
 
@@ -57,8 +58,12 @@ class EVRP_GA:
         }
 
     def initialize(self):
+        self.dist_matrix = calcular_matriz_prioridade(self.evrp_data)
+        print(self.dist_matrix)
         n_pop = self.param_ga['n_pop']
         self.population = [criar_rotas_aleatorias(self.evrp_data, self.param_problema['num_rotas_min'], self.param_problema['restricoes']) for _ in range(n_pop)]
+        #self.population = [criar_rota_nn_inteligente_com_rotas_minimas(self.evrp_data, self.param_problema['num_rotas_min']) for _ in range(n_pop)]
+        self.population = [aplicar_restricao(rotas, self.evrp_data, self.param_problema['num_rotas_min']) for rotas in self.population]
         #print(f"Iniciou com: {len(self.population)} rotas")
     
     def evaluate(self):
@@ -73,17 +78,45 @@ class EVRP_GA:
         self.pais = metodo(self.population, self.fitness, self.param_ga['n_pais'])
         #print(f"Seleciou {len(self.pais)} pais")
 
-    def crossover(self):
-        self.filhos = crossover_completo(self.pais, self.evrp_data, n_filhos = self.param_ga['n_filhos'], num_rotas_min=self.param_problema['num_rotas_min'], tipo_crossover=self.config['crossover'], taxa_crossover=1, estacao=self.param_problema['restricoes'])
+    #def crossover(self):
+        #self.filhos = [crossover_nn(pai1, pai2, self.evrp_data, self.dist_matrix) for pai1, pai2 in zip(self.pais[::2], self.pais[1::2])]
+        #self.filhos = crossover_completo(self.pais, self.evrp_data, n_filhos = self.param_ga['n_filhos'], num_rotas_min=self.param_problema['num_rotas_min'], tipo_crossover=self.config['crossover'], taxa_crossover=1, estacao=self.param_problema['restricoes'])
         #print(f"Gerou {len(self.filhos)} filhos")
+
+    def crossover(self):
+        if random.random() < 0.6:  # 60% chance de usar o balanceador
+            self.filhos = []
+            for i in range(0, len(self.pais), 2):
+                if i+1 < len(self.pais):
+                    f1, f2 = crossover_balanceador(
+                        self.pais[i], self.pais[i+1],
+                        self.evrp_data, self.dist_matrix, self.param_problema['num_rotas_min']
+                    )
+                    self.filhos.extend([f1, f2])
+        else:  # 40% chance de usar o NN
+            self.filhos = [
+                crossover_nn(pai1, pai2, self.evrp_data, self.dist_matrix,  num_rotas_min=self.param_problema['num_rotas_min'])
+                for pai1, pai2 in zip(self.pais[::2], self.pais[1::2])
+            ]
 
     def mutation(self):
         if self.config['mutation'] == '': return
-        self.filhos = aplicar_mutacao(self.filhos, self.evrp_data, self.param_problema['num_rotas_min'], metodo=self.config['mutation'], taxa_mutacao=0.1, estacao=self.param_problema['restricoes'])
+        #self.filhos = aplicar_mutacao(self.filhos, self.evrp_data, self.param_problema['num_rotas_min'], metodo=self.config['mutation'], taxa_mutacao=0.1, estacao=self.param_problema['restricoes'])
+        #self.filhos = aplicar_mutacao_rest(self.filhos, self.evrp_data, self.dist_matrix, self.param_problema['num_rotas_min'], metodo=self.config['mutation'], taxa_mutacao=0.1, estacao=self.param_problema['restricoes'])
+        self.filhos = [
+            mutacao_balanceamento_carga(filho, self.evrp_data, self.dist_matrix, 0.7, num_rotas_min=self.param_problema['num_rotas_min'])
+            for filho in self.filhos
+        ]
+        self.filhos = [mutacao_nn(filho, self.evrp_data, self.dist_matrix, taxa_mutacao = 0.7, num_rotas_min=self.param_problema['num_rotas_min']) 
+        for filho in self.filhos
+        ]
+        self.filhos = [mutacao_otimiza_rota(filho, self.evrp_data, self.dist_matrix, taxa_mutacao = 0.7, num_rotas_min=self.param_problema['num_rotas_min']) 
+        for filho in self.filhos
+        ]
         #print(f"Mutação em {len(self.filhos)} filhos")
 
     def replacement(self):
-        fitness_filhos = avaliacao_rankeamento(self.filhos, self.evrp_data)
+        fitness_filhos = avaliacao_com_penalidades(self.filhos, self.evrp_data)
         self.new_pop = gerar_nova_populacao(self.population, self.filhos, self.fitness, fitness_filhos, metodo=self.config['replacement'], 
                          n_pop=self.param_ga['n_pop'], n_pais=self.param_ga['n_pais'], n_filhos=self.param_ga['n_filhos'], n_elite=5)
         #print(f"Finalizou com: {len(self.new_pop)} rotas")

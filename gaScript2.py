@@ -1,6 +1,7 @@
 import ast
 from itertools import product
-from gaClass import *
+#from gaClass import *
+from gaClass3 import *
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,114 +10,92 @@ import glob
 random.seed(1)
 
 param_gaDict = {
-        "expo_alta":
-                {
-                'n_pop': 100,
-                'n_pais': 40,
-                'n_filhos': 200,
-                'taxa_crossover': 0.9,
-                'taxa_mutacao': 0.2,
-                'n_elite': 10,
-                'limite_convergencia': 20,
-                'bits_por_cidade': None,
-                },
-        "expo_med_conv":
-                {
-                'n_pop': 50,
-                'n_pais': 30,
-                'n_filhos': 100,
-                'taxa_crossover': 0.85,
-                'taxa_mutacao': 0.1,
-                'n_elite': 15,
-                'limite_convergencia': 20,
-                'bits_por_cidade': None,
-                },
-        "expo_grandInst":
-                {
-                'n_pop': 150,
-                'n_pais': 80,
-                'n_filhos': 300,
-                'taxa_crossover': 0.9,
-                'taxa_mutacao': 0.3,
-                'n_elite': 30,
-                'limite_convergencia': 20,
-                'bits_por_cidade': None,
-                }
-        }
+    'params_ga' : {
+        'n_pop': 100,                # População maior para mais diversidade
+        'n_geracoes': 500,
+        'max_aval': 25000*5,
+        'taxa_crossover': 1,
+        'taxa_mutacao': 0.9,        # Mutação baixa para evitar perturbações excessivas
+        'n_pais': 20,
+        'n_filhos': 80,
+        'n_elite': 15,
+        'num_rotas_min': 3,          # Definido pelo problema
+        'limite_convergencia': 20    # Parar se não houver melhoria em 20 gerações
+    },
+    }
 config = {
-                'evaluation': "distancia",
-                'selection': "torneio",
-                'tamanho_torneio': 2,
-                'crossover': "uniforme",
-                'mutation': "inversao",
-                'replacement': "elitismo"
-
-            }
-listparams = ["expo_alta","expo_med_conv","expo_grandInst"]
+        'evaluation': 'restricoes',  # Usar penalidades para restrições distancia/restricoes
+        'selection': 'torneio',      # Torneio é mais eficiente para evitar convergência prematura
+        'tamanho_torneio': 5,
+        'crossover': 'two_point',    # Combinação mais equilibrada
+        'mutation': 'swap',          # Mutação simples para preservar estrutura
+        'replacement': 'elitismo'    # Mantém as melhores soluções
+    }
+listparams = ["params_ga"]
 ervps = ['E-n23-k3.evrp','E-n51-k5.evrp']
 ervpdict = {ervps[0]: [573.14, 32 * 25000, 3], ervps[1]: [570.17,60 * 25000,5]}
 best_routes = []
 table_data = []
-# for arq in ervps:
-#     for params in listparams:
-#         params_ga = param_gaDict[params]
-#         params_ga["max_aval"] = ervpdict[arq][1]
-#         params_ga['num_rotas_min'] = ervpdict[arq][2]
-#         
-#         for run_idx in range(20):
-#             print(f'Rodando melhor config novamente #{run_idx+1}...')
-#             ga = EVRP_GA(arq, params_ga, config,estrat=params, id = run_idx+1)
-#             best_solution = ga.run_2()
+for arq in ervps:
+    for params in listparams:
+        params_ga = param_gaDict[params]
+        params_ga["max_aval"] = ervpdict[arq][1]
+        params_ga['num_rotas_min'] = ervpdict[arq][2]
+        
+        for run_idx in range(20):
+            print(f'Rodando melhor config novamente #{run_idx+1}...')
+            ga = EVRP_GA(arq, params_ga, config,estrat=params, id = run_idx+1)
+            best_solution = ga.run_2()
 
-#             best_routes.append(best_solution)
+            best_routes.append(best_solution)
 
-#             row = {
-#                 'id': run_idx + 1,
-#                 'distancia': calcular_distancia_total(ga.evrp_data, best_solution),
-#                 'rota':best_solution
-#             }
-#             table_data.append(row)  # <-- estava faltando adicionar aqui!
+            row = {
+                'id': run_idx + 1,
+                'distancia': calcular_distancia_total(ga.evrp_data, best_solution),
+                'rota':best_solution
+            }
+            table_data.append(row)  # <-- estava faltando adicionar aqui!
 
-#         # Cria DataFrame
-#         df_results = pd.DataFrame(table_data)
-#         df_results.to_csv(f'results/resultados_ga_{arq}_{params}_trabalho2.csv', index=False)
+        # Cria DataFrame
+        df_results = pd.DataFrame(table_data)
+        df_results.to_csv(f'results/resultados_ga_{arq}_{params}_trabalho3.csv', index=False)
 
-# # Pega todos os arquivos CSV no padrão desejado
-# for params in listparams:
-#     for arq in ervps:
-#         arquivos = glob.glob(f'results/csvs/melhores_resultados_{arq}_{params}_*.csv')
+# Pega todos os arquivos CSV no padrão desejado
+for params in listparams:
+    for arq in ervps:
+        arquivos = glob.glob(f'results/csvs/melhores_resultados3_{arq}_{params}_*.csv')
 
-#         for arquivo in arquivos:
-#             # Extrai id do nome do arquivo
-#             id_tentativa = arquivo.split('resultados')[-1].split('.csv')[0]
+        for arquivo in arquivos:
+            # Extrai id do nome do arquivo
+            id_tentativa = arquivo.split('resultados')[-1].split('.csv')[0]
             
-#             print(f'Processando tentativa {id_tentativa}...')
-#             # Lê CSV, ignora a coluna Melhor_Rota
-#             df = pd.read_csv(arquivo,header=None, names=['Avaliacoes', 'Distancia', 'Tipo', 'crossover', 'mutation'])
-#             # ============= Gráfico de Progressão ==============
-#             plt.figure(figsize=(10, 6))
-#             plt.plot(df['Avaliacoes'], df['Distancia'], marker='o', label='Distância')
-#             plt.axhline(y=ervpdict[arq][0], color='red', linestyle='--', label=f'Melhor Meta ({ervpdict[arq][0]})')
+            print(f'Processando tentativa {id_tentativa}...')
+            # Lê CSV, ignora a coluna Melhor_Rota
+            df = pd.read_csv(arquivo,header=None, names=['Avaliacoes', 'Distancia', 'Tipo', 'crossover', 'mutation'])
+            # ============= Gráfico de Progressão ==============
+            plt.figure(figsize=(10, 6))
+            plt.plot(df['Avaliacoes'], df['Distancia'], marker='o', label='Distância')
+            plt.axhline(y=ervpdict[arq][0], color='red', linestyle='--', label=f'Melhor Meta ({ervpdict[arq][0]})')
 
-#             plt.title(f'Gráfico de Progressão de Resultados Tentativa {id_tentativa}')
-#             plt.xlabel('Avaliações')
-#             plt.ylabel('Distância')
-#             plt.legend()
-#             plt.grid(True)
-#             plt.tight_layout()
-#             plt.savefig(f'results/pngs/progressao{id_tentativa}_{arq}.png')
-#             plt.close()
+            plt.title(f'Gráfico de Progressão de Resultados Tentativa {id_tentativa}')
+            plt.xlabel('Avaliações')
+            plt.ylabel('Distância')
+            plt.legend()
+            plt.grid(True)
+            plt.tight_layout()
+            plt.savefig(f'results/pngs/progressao{id_tentativa}_{arq}_trab3.png')
+            plt.close()
 
-#             # ============= Gráfico de Pizza (Concentração) ==============
-#             plt.figure(figsize=(8, 8))
-#             counts = df['Tipo'].value_counts()
-#             plt.pie(counts, labels=counts.index, autopct='%1.1f%%', startangle=140)
-#             plt.title(f'Gráfico de Concentração de Alterações Tentativa {id_tentativa}')
-#             plt.tight_layout()
-#             plt.savefig(f'results/pngs/concentracao{id_tentativa}_{arq}.png')
-#             plt.close()
+            # ============= Gráfico de Pizza (Concentração) ==============
+            plt.figure(figsize=(8, 8))
+            counts = df['Tipo'].value_counts()
+            plt.pie(counts, labels=counts.index, autopct='%1.1f%%', startangle=140)
+            plt.title(f'Gráfico de Concentração de Alterações Tentativa {id_tentativa}')
+            plt.tight_layout()
+            plt.savefig(f'results/pngs/concentracao{id_tentativa}_{arq}_trab3.png')
+            plt.close()
 
-#             print(f'Gráficos salvos para tentativa {id_tentativa}.')
+            print(f'Gráficos salvos para tentativa {id_tentativa}.')
 
 
 
@@ -126,7 +105,7 @@ for arq in ervps:
         params_ga["max_aval"] = ervpdict[arq][1]
         params_ga['num_rotas_min'] = ervpdict[arq][2]
 
-        df_results = pd.read_csv(f'results/resultados_ga_{arq}_{params}_trabalho2.csv')
+        df_results = pd.read_csv(f'results/resultados_ga_{arq}_{params}_trabalho3.csv')
         media = df_results['distancia'].mean()
         minimo = df_results['distancia'].min()
         maximo = df_results['distancia'].max()
@@ -163,7 +142,7 @@ import os
 
 for params in listparams:
     for arq in ervps:
-        arquivos = glob.glob(f'results/csvs/melhores_resultados_{arq}_{params}_*.csv')
+        arquivos = glob.glob(f'results/csvs/melhores_resultados3_{arq}_{params}_*.csv')
         
         if not arquivos:
             print(f'Nenhum arquivo encontrado para {arq} com parâmetros {params}')
